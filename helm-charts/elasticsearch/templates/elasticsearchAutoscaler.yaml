@@ -1,0 +1,23 @@
+apiVersion: autoscaling.k8s.elastic.co/v1
+kind: ElasticsearchAutoscaler
+metadata:
+  name: autoscaling-test
+spec:
+  elasticsearchRef:
+    name: elasticsearch-master
+  policies:
+    - name: data-ingest
+      roles: ["data", "ingest" , "transform"]
+      resources:
+        # nodeCount:
+        #   min: 3
+        #   max: 9
+        cpu:
+          min: 250
+          max: 1
+        memory:
+          min: 256Mi
+          max: 1Gi
+        storage:
+          min: 2Gi
+          max: 4Gi
