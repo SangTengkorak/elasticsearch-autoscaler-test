@@ -21,7 +21,7 @@ roles:
   - remote_cluster_client
   - transform
 
-replicas: 3
+replicas: 2
 minimumMasterNodes: 2
 
 esMajorVersion: ""
@@ -75,7 +75,7 @@ hostAliases: []
 #  - "foo.local"
 #  - "bar.local"
 
-image: "docker.elastic.co/elasticsearch/elasticsearch"
+image: "elasticsearch"
 imageTag: "7.17.17"
 imagePullPolicy: "IfNotPresent"
 
@@ -89,10 +89,10 @@ esJavaOpts: "" # example: "-Xmx1g -Xms1g"
 
 resources:
   requests:
-    cpu: "250m"
-    memory: "512Mi"
-  limits:
     cpu: "500m"
+    memory: "1Gi"
+  limits:
+    cpu: "1000m"
     memory: "1Gi"
 
 initResources: {}
@@ -109,7 +109,7 @@ volumeClaimTemplate:
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 2Gi
+      storage: 1Gi
 
 rbac:
   create: false
