@@ -4,10 +4,21 @@
 ❯❯ https://www.gooksu.com/2021/05/elastic-cloud-on-kubernetes-eck-on-minikube/
 ❯❯ https://cloudnativeengineer.substack.com/p/ep-11-elasticsearch-development-environment
 
+# setup minikube to capable running eck
+❯❯ https://backstage.forgerock.com/docs/forgeops/7.1/legacy/cdk/minikube/setup/vm.html
+❯❯ minikube start --cpus 4 --memory 6144 --disk-size 40g
+
+# add eck CRDs
+❯❯ kubectl create -f https://download.elastic.co/downloads/eck/2.4.0/crds.yaml
+
 # install operator and CRDs
+# using helm charts
 ❯❯ helm repo add elastic https://helm.elastic.co
 ❯❯ helm repo update
 ❯❯ helm install elastic-operator elastic/eck-operator -n elastic-system --create-namespace
+
+# manual manifest file
+❯❯ https://www.elastic.co/guide/en/cloud-on-k8s/2.4/k8s-deploy-eck.html
 
 # add elasticsearch trial certificate to enable autoscaling
 cat <<EOF | kubectl apply -f -
@@ -21,3 +32,10 @@ metadata:
   annotations:
     elastic.co/eula: accepted 
 EOF
+
+# clean lab
+❯❯ https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-uninstalling-eck.html
+❯❯ kubectl get namespaces --no-headers -o custom-columns=:metadata.name| xargs -n1 kubectl delete elastic --all -n
+# optional to uninstall operator
+❯❯ kubectl delete -f https://download.elastic.co/downloads/eck/2.11.1/operator.yaml
+❯❯ kubectl delete -f https://download.elastic.co/downloads/eck/2.11.1/crds.yaml
