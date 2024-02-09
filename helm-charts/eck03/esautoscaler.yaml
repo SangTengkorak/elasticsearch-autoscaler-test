@@ -21,5 +21,5 @@ spec:
           min: 2Gi
           max: 2Gi
         storage:
-          min: 20Gi
+          min: 15Gi
           max: 20Gi

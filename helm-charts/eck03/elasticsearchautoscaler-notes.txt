@@ -1,0 +1,103 @@
+# ECK 2.4.0 not supporting ealsticsearch autoscaler
+muhammad.pratomo@Muhammad-Pratomo ~ % kubectl get crd
+NAME                                                 CREATED AT
+agents.agent.k8s.elastic.co                          2024-02-08T23:36:17Z
+apmservers.apm.k8s.elastic.co                        2024-02-08T23:36:17Z
+beats.beat.k8s.elastic.co                            2024-02-08T23:36:17Z
+elasticmapsservers.maps.k8s.elastic.co               2024-02-08T23:36:17Z
+elasticsearches.elasticsearch.k8s.elastic.co         2024-02-08T23:36:17Z
+enterprisesearches.enterprisesearch.k8s.elastic.co   2024-02-08T23:36:17Z
+kibanas.kibana.k8s.elastic.co                        2024-02-08T23:36:17Z
+
+# Installing latest ECK 2.11, elasticsearchautoscaler CRD is appear in library
+muhammad.pratomo@Muhammad-Pratomo ~ % kubectl get crd
+NAME                                                   CREATED AT
+agents.agent.k8s.elastic.co                            2024-02-08T23:36:17Z
+apmservers.apm.k8s.elastic.co                          2024-02-08T23:36:17Z
+beats.beat.k8s.elastic.co                              2024-02-08T23:36:17Z
+elasticmapsservers.maps.k8s.elastic.co                 2024-02-08T23:36:17Z
+elasticsearchautoscalers.autoscaling.k8s.elastic.co    2024-02-08T23:40:15Z
+elasticsearches.elasticsearch.k8s.elastic.co           2024-02-08T23:36:17Z
+enterprisesearches.enterprisesearch.k8s.elastic.co     2024-02-08T23:36:17Z
+kibanas.kibana.k8s.elastic.co                          2024-02-08T23:36:17Z
+logstashes.logstash.k8s.elastic.co                     2024-02-08T23:40:15Z
+stackconfigpolicies.stackconfigpolicy.k8s.elastic.co   2024-02-08T23:40:15Z
+
+# elasticsearchautosclaer suspected not workin in ECK 2.4.0 operators
+muhammad.pratomo@Muhammad-Pratomo ~ % kubectl describe elasticsearchautoscaler esa-test -n elastic-system                           
+Name:         esa-test
+Namespace:    elastic-system
+Labels:       <none>
+Annotations:  <none>
+API Version:  autoscaling.k8s.elastic.co/v1alpha1
+Kind:         ElasticsearchAutoscaler
+Metadata:
+  Creation Timestamp:  2024-02-09T00:05:04Z
+  Generation:          1
+  Resource Version:    2966
+  UID:                 b89afba9-c715-475d-8174-d3dddef05548
+Spec:
+  Elasticsearch Ref:
+    Name:  mtesc
+  Policies:
+    Name:  masters
+    Resources:
+      Cpu:
+        Max:  2
+        Min:  1
+      Memory:
+        Max:  2Gi
+        Min:  2Gi
+      Node Count:
+        Max:  2
+        Min:  1
+      Storage:
+        Max:  20Gi
+        Min:  15Gi
+    Roles:
+      masteng
+      data
+      ml
+      ingest
+      transform
+Events:  <none>
+
+# running with ECK 2.11 operator, elasticsearch autoscaler is capable to recognize elasticsearch cluster to maintain
+muhammad.pratomo@Muhammad-Pratomo ~ % kubectl get elasticsearchautoscaler esa-test -n elastic-system -o jsonpath='{ .status.conditions }' | jq
+[
+  {
+    "lastTransitionTime": "2024-02-09T00:33:32Z",
+    "status": "False",
+    "type": "Limited"
+  },
+  {
+    "lastTransitionTime": "2024-02-09T00:33:32Z",
+    "message": "Issues reported for the following policies: [masters]. Check operator logs, Kubernetes events, and policies status for more details",
+    "status": "False",
+    "type": "Healthy"
+  },
+  {
+    "lastTransitionTime": "2024-02-09T00:33:32Z",
+    "status": "True",
+    "type": "Active"
+  },
+  {
+    "lastTransitionTime": "2024-02-09T00:33:32Z",
+    "message": "Elasticsearch is available",
+    "status": "True",
+    "type": "Online"
+  }
+]
+muhammad.pratomo@Muhammad-Pratomo ~ % kubectl describe elasticsearchautoscaler esa-test -n elastic-system                                  
+Name:         esa-test
+Namespace:    elastic-system
+Labels:       <none>
+Annotations:  <none>
+API Version:  autoscaling.k8s.elastic.co/v1alpha1
+Kind:         ElasticsearchAutoscaler
+Metadata:
+  Creation Timestamp:  2024-02-09T00:33:32Z
+  Generation:          1
+  Resource Version:    6012
+  UID:                 4a04a792-5de3-455c-8af6-485f1ff85205
+Spec:
