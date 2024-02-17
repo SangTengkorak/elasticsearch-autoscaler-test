@@ -3,13 +3,22 @@
 ❯❯ https://medium.com/@KushanJanith/run-elastic-stack-on-kubernetes-29e295cd6531
 ❯❯ https://www.gooksu.com/2021/05/elastic-cloud-on-kubernetes-eck-on-minikube/
 ❯❯ https://cloudnativeengineer.substack.com/p/ep-11-elasticsearch-development-environment
+❯❯ https://kubernetes.io/docs/concepts/storage/storage-classes/#local
+❯❯ https://kubernetes.io/docs/tasks/administer-cluster/change-default-storage-class/
+
+# pod cpu load test
+https://www.geeksforgeeks.org/how-to-impose-high-cpu-load-and-stress-test-on-linux-using-stress-ng-tool/
+
+# add rancher local-path-provisioner
+❯❯ https://github.com/rancher/local-path-provisioner
 
 # setup minikube to capable running eck
 ❯❯ https://backstage.forgerock.com/docs/forgeops/7.1/legacy/cdk/minikube/setup/vm.html
 ❯❯ minikube start --cpus 4 --memory 6144 --disk-size 40g
 
 # add eck CRDs
-❯❯ kubectl create -f https://download.elastic.co/downloads/eck/2.4.0/crds.yaml
+https://www.elastic.co/guide/en/cloud-on-k8s/2.5/k8s-deploy-eck.html
+❯❯ kubectl create -f https://download.elastic.co/downloads/eck/2.5.0/crds.yaml
 
 # install operator and CRDs
 # using helm charts
@@ -18,7 +27,7 @@
 ❯❯ helm install elastic-operator elastic/eck-operator -n elastic-system --create-namespace
 
 # manual manifest file
-❯❯ https://www.elastic.co/guide/en/cloud-on-k8s/2.4/k8s-deploy-eck.html
+❯❯ https://www.elastic.co/guide/en/cloud-on-k8s/2.5/k8s-deploy-eck.html
 
 # add elasticsearch trial certificate to enable autoscaling
 cat <<EOF | kubectl apply -f -
@@ -33,9 +42,24 @@ metadata:
     elastic.co/eula: accepted 
 EOF
 
+# monitor elasticsearchautoscaling
+kubectl get elasticsearchautoscaler.autoscaling.k8s.elastic.co/esa-test -n elastic-system -o jsonpath='{ .status.policies }' | jq
+
+# to install cpu stress test package on running pod, first login to running pod shell
+kubectl exec -it -n elastic-system mtesc-es-masters-0 -- /bin/sh
+AND
+kubectl exec -it -n elastic-system mtesc-es-masters-1 -- /bin/sh
+
+# run linux command to install required packages
+apt update
+apt install stress stress-ng
+
+# run cpu load test from inside pod
+stress-ng --cpu 4 --cpu-load 90 --timeout 600s
+
 # clean lab
 ❯❯ https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-uninstalling-eck.html
 ❯❯ kubectl get namespaces --no-headers -o custom-columns=:metadata.name| xargs -n1 kubectl delete elastic --all -n
 # optional to uninstall operator
-❯❯ kubectl delete -f https://download.elastic.co/downloads/eck/2.11.1/operator.yaml
-❯❯ kubectl delete -f https://download.elastic.co/downloads/eck/2.11.1/crds.yaml
+❯❯ kubectl delete -f https://download.elastic.co/downloads/eck/2.5.0/operator.yaml
+❯❯ kubectl delete -f https://download.elastic.co/downloads/eck/2.5.0/crds.yaml

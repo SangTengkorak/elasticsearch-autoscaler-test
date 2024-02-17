@@ -18,8 +18,8 @@ spec:
         - name: elasticsearch
           resources:
             limits:
-              memory: 2Gi
-              cpu: 1
+              memory: 1Gi
+              cpu: 450m
           env:
           - name: ES_JAVA_OPTS
             value: "-Xms512m -Xmx512m"              
@@ -31,7 +31,8 @@ spec:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 10Gi
+            storage: 1024Mi
+        storageClassName: mastengsc
   http:
     service:
       spec:
