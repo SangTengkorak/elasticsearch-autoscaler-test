@@ -1,0 +1,21 @@
+elasticsearch:
+  enabled: true
+  replicaCount: 2
+  version: 7.17.17
+  container:
+    resources:
+      requests:
+        memory: 1Gi
+        cpu: 500m
+  
+  vpaScaling:
+    enabled: true
+    mode: "Off"
+  
+  volumeClaimTemplates:
+    resources:
+      requests:
+        storage: 512M
+    storageClassName: mastengsc
+
+  allow_map: false
