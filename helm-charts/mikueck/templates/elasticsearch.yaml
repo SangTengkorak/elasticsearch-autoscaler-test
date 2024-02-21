@@ -1,0 +1,41 @@
+---
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: {{ .Release.Name }}-lab
+  namespace: elastic-system
+  labels: 
+    app: {{ .Release.Name }}-lbl
+spec:
+  version: {{ .Values.elasticsearch.version }}
+  nodeSets:
+  - name: masters
+    count: {{ .Values.elasticsearch.replicaCount }}
+    config:
+      node.roles: ["master", "data", "ingest", "transform"]
+      {{- $am_bool := "false" | quote -}}
+      {{ if .Values.elasticsearch.allow_map }}
+      {{- $mode = .Values.elasticsearch.allow_map | quote -}}
+      {{ end}}
+      node.store.allow_mmap: {{ $am_bool }}
+    podTemplate:
+      spec:
+        containers:
+        - name: elasticsearch
+          resources:
+            requests:
+              memory: {{ .Values.elasticsearch.container.resources.requests.memory }}
+              cpu: {{ .Values.elasticsearch.container.resources.requests.cpu }}
+          env:
+          - name: ES_JAVA_OPTS
+            value: "-Xms512m -Xmx512m"           
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.elasticsearch.volumeClaimTemplates.resources.requests.storage }}
+        storageClassName: {{ .Values.elasticsearch.volumeClaimTemplates.storageClassName }}
