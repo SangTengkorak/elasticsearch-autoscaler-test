@@ -1,9 +1,0 @@
-ESAutoscaler explanation
-https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-autoscaling.html
-
-ES Helm repo
-https://github.com/elastic/helm-charts/tree/main/elasticsearch
-
-Deploy ES in k8s
-https://dev.to/sagary2j/elk-stack-deployment-using-minikube-single-node-architecture-16cl
-https://github.com/sagary2j/ELK-Stack-Kubernetes-minikube/blob/main/es-deployment.yaml
